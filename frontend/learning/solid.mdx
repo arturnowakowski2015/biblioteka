@@ -1,0 +1,458 @@
+Przejdź do głównej zawartościUłatwienia dostępu – pomoc
+Opinia o ułatwieniach dostępu
+Tryb AI
+Wszystko
+Grafika
+Wideo
+Krótkie filmy
+Więcej
+
+
+
+Single Responsibility Principle (Zasada Jednej Odpowiedzialności) napisz zla klasa
+Oto przykład klasy, która łamie Zasadę Jednej Odpowiedzialności (SRP). Taki kod nazywamy często „Boskim Obiektem” (God Object), ponieważ próbuje robić wszystko naraz.
+Przykład złej klasy (antywzorzec)
+csharp
+public class Faktura
+{
+    public int Id { get; set; }
+    public double Kwota { get; set; }
+
+    // 1. Logika biznesowa (obliczanie danych)
+    public double ObliczPodatek() 
+    {
+        return Kwota * 0.23;
+    }
+
+    // 2. Obsługa bazy danych (trwałość danych)
+    public void ZapiszDoBazy() 
+    {
+        Console.WriteLine("Zapisywanie faktury do bazy danych...");
+    }
+
+    // 3. Generowanie raportów (prezentacja danych)
+    public void DrukujFakture() 
+    {
+        Console.WriteLine($"Faktura nr {Id}, Kwota: {Kwota}");
+    }
+
+    // 4. Powiadomienia (komunikacja zewnętrzna)
+    public void WyslijEmail() 
+    {
+        Console.WriteLine("Wysyłanie faktury do klienta...");
+    }
+}
+Używaj kodu z rozwagą.
+
+Dlaczego to jest złe?
+Ta klasa ma aż cztery powody do zmiany:
+Zmiana stawek podatkowych.
+Zmiana bazy danych (np. z SQL na MongoDB).
+Zmiana formatu wydruku faktury.
+Zmiana dostawcy usług e-mail.
+Każda modyfikacja w jednym z tych obszarów może przypadkowo zepsuć pozostałe funkcjonalności, co czyni kod trudnym w utrzymaniu i testowaniu.
+Czy chcesz zobaczyć, jak rozbić tę klasę na mniejsze elementy zgodnie z zasadą SRP?
+Odpowiedzi wygenerowane przez AI mogą zawierać błędy. Więcej informacji
+
+
+
+
+tak
+Oto jak poprawnie rozdzielić powyższą klasę na mniejsze, wyspecjalizowane komponenty. Teraz każda klasa ma tylko jeden powód do zmiany.
+Przykład poprawnej implementacji (zgodnej z SRP)
+csharp
+// 1. Tylko dane i prosta logika biznesowa
+public class Faktura
+{
+    public int Id { get; set; }
+    public double Kwota { get; set; }
+
+    public double ObliczPodatek() => Kwota * 0.23;
+}
+
+// 2. Odpowiada wyłącznie za bazę danych
+public class FakturaRepository
+{
+    public void Zapisz(Faktura faktura) 
+    {
+        Console.WriteLine("Zapisano do bazy.");
+    }
+}
+
+// 3. Odpowiada wyłącznie za formatowanie/druk
+public class FakturaPrinter
+{
+    public void Drukuj(Faktura faktura) 
+    {
+        Console.WriteLine($"Wydruk faktury nr {faktura.Id}");
+    }
+}
+
+// 4. Odpowiada wyłącznie za komunikację
+public class EmailService
+{
+    public void Wyslij(Faktura faktura, string email) 
+    {
+        Console.WriteLine($"Wysłano do {email}");
+    }
+}
+Używaj kodu z rozwagą.
+
+Co zyskaliśmy?
+Łatwiejsze testy: Możesz przetestować obliczenia podatku bez łączenia się z bazą danych.
+Elastyczność: Jeśli zmienisz bazę danych na inną, edytujesz tylko klasę FakturaRepository.
+Czystość: Kod jest czytelny, a nazwy klas jasno mówią, co dany moduł robi.
+Czy chcesz teraz przejść do kolejnej litery z literowca SOLID, czyli Open/Closed Principle?
+Odpowiedzi wygenerowane przez AI mogą zawierać błędy. Więcej informacji
+
+
+
+
+Open/Closed Principle (Zasada Otwarte/Zamknięte) napisz przyklad w typescript
+Zasada Open/Closed (OCP) mówi, że klasy powinny być otwarte na rozszerzenia, ale zamknięte na modyfikacje. Oznacza to, że powinieneś móc dodać nową funkcjonalność bez edytowania istniejącego kodu (co mogłoby go zepsuć).
+Oto przykład w TypeScript – najpierw błąd, a potem rozwiązanie.
+❌ Złe podejście (Łamanie OCP)
+Jeśli chcemy dodać nową formę płatności, musimy modyfikować klasę PaymentProcessor i dopisywać kolejne if lub switch.
+typescript
+class PaymentProcessor {
+    process(amount: number, type: 'creditCard' | 'paypal' | 'crypto') {
+        if (type === 'creditCard') {
+            console.log(`Płacę ${amount} kartą.`);
+        } else if (type === 'paypal') {
+            console.log(`Płacę ${amount} przez PayPal.`);
+        }
+        // Za każdym razem, gdy dodamy nową metodę (np. 'crypto'),
+        // musimy edytować ten plik i zmieniać tę funkcję.
+    }
+}
+Używaj kodu z rozwagą.
+
+✅ Dobre podejście (Zgodne z OCP)
+Używamy interfejsu. Aby dodać nową metodę płatności, po prostu tworzymy nową klasę. Główny procesor płatności pozostaje nienaruszony.
+typescript
+// Definiujemy wspólny kontrakt
+interface PaymentMethod {
+    pay(amount: number): void;
+}
+
+// Tworzymy konkretne implementacje
+class CreditCardPayment implements PaymentMethod {
+    pay(amount: number) {
+        console.log(`Płacę ${amount} kartą.`);
+    }
+}
+
+class PayPalPayment implements PaymentMethod {
+    pay(amount: number) {
+        console.log(`Płacę ${amount} przez PayPal.`);
+    }
+}
+
+// Chcesz dodać Crypto? Po prostu dopisujesz nową klasę:
+class CryptoPayment implements PaymentMethod {
+    pay(amount: number) {
+        console.log(`Płacę ${amount} kryptowalutami.`);
+    }
+}
+
+// Procesor jest teraz ZAMKNIĘTY na modyfikacje, 
+// bo nie musi wiedzieć, jakie metody płatności istnieją.
+class PaymentProcessor {
+    process(amount: number, method: PaymentMethod) {
+        method.pay(amount);
+    }
+}
+Używaj kodu z rozwagą.
+
+Co zyskaliśmy?
+Jeśli za miesiąc będziesz chciał dodać płatność Apple Pay, nie dotykasz ani jednej linijki w klasie PaymentProcessor. Po prostu tworzysz nową klasę implementującą PaymentMethod.
+Czy chcesz teraz omówić literę L, czyli Liskov Substitution Principle (LSP)?
+Odpowiedzi wygenerowane przez AI mogą zawierać błędy. Więcej informacji
+
+
+
+
+jak to wywolac
+Aby uruchomić ten kod, musisz stworzyć instancję procesora oraz konkretnej metody płatności, a następnie przekazać tę metodę do procesora.
+Oto jak to wygląda w praktyce:
+typescript
+// 1. Tworzymy główny procesor
+const processor = new PaymentProcessor();
+
+// 2. Wybieramy konkretną metodę płatności (np. Kartę)
+const card = new CreditCardPayment();
+processor.process(100, card); // Wynik: Płacę 100 kartą.
+
+// 3. Chcemy zapłacić PayPalem? Po prostu przekazujemy inny obiekt
+const paypal = new PayPalPayment();
+processor.process(250, paypal); // Wynik: Płacę 250 przez PayPal.
+
+// 4. A jeśli dodaliśmy Crypto, wywołanie wygląda identycznie:
+const crypto = new CryptoPayment();
+processor.process(500, crypto); // Wynik: Płacę 500 kryptowalutami.
+Używaj kodu z rozwagą.
+
+Dlaczego to jest super?
+Zauważ, że funkcja processor.process() zawsze przyjmuje to samo: kwotę i obiekt, który spełnia kontrakt PaymentMethod. Nie interesuje jej, czy to karta, krowy, czy złoto – dopóki obiekt ma metodę .pay(), wszystko działa.
+Czy chcesz przejść do Liskov Substitution Principle, która tłumaczy, dlaczego klasy pochodne nie mogą "psuć" działania programu?
+Odpowiedzi wygenerowane przez AI mogą zawierać błędy. Więcej informacji
+
+
+
+
+Liskov Substitution Principle (Zasada Podstawienia Liskov)
+Zasada Liskov Substitution Principle (LSP) mówi, że obiekty klasy pochodnej (podrzędnej) muszą być w stanie zastąpić obiekty klasy bazowej bez przerywania poprawnego działania programu.
+Mówiąc prościej: jeśli Twoja funkcja oczekuje Ptaka, to po podłożeniu Strusia nie może nagle "wybuchnąć" tylko dlatego, że struś nie lata.
+❌ Złe podejście (Łamanie LSP)
+Klasyczny błąd: tworzymy klasę Kwadrat, która dziedziczy po Prostokącie. Kwadrat wymusza, by szerokość i wysokość były równe, co psuje logikę prostokąta.
+typescript
+class Prostokat {
+    constructor(public szerokosc: number, public wysokosc: number) {}
+
+    ustawSzerokosc(w: number) { this.szerokosc = w; }
+    ustawWysokosc(h: number) { this.wysokosc = h; }
+    obliczPole() { return this.szerokosc * this.wysokosc; }
+}
+
+class Kwadrat extends Prostokat {
+    // Nadpisujemy metody tak, by zawsze trzymać równe boki
+    ustawSzerokosc(w: number) {
+        this.szerokosc = w;
+        this.wysokosc = w;
+    }
+    ustawWysokosc(h: number) {
+        this.szerokosc = h;
+        this.wysokosc = h;
+    }
+}
+
+// PROBLEM:
+function powiekszSzerokosc(p: Prostokat) {
+    p.ustawSzerokosc(10);
+    // Jeśli p to Kwadrat, to po ustawieniu szerokości na 10,
+    // wysokość też stanie się 10. Pole wyniesie 100, 
+    // a my spodziewaliśmy się tylko zmiany szerokości!
+}
+Używaj kodu z rozwagą.
+
+✅ Dobre podejście (Zgodne z LSP)
+Zamiast zmuszać kwadrat do bycia prostokątem, wydzielamy wspólny interfejs dla figur, które mają pole powierzchni.
+typescript
+interface Figura {
+    obliczPole(): number;
+}
+
+class Prostokat implements Figura {
+    constructor(private szerokosc: number, private wysokosc: number) {}
+    obliczPole() { return this.szerokosc * this.wysokosc; }
+}
+
+class Kwadrat implements Figura {
+    constructor(private bok: number) {}
+    obliczPole() { return this.bok * this.bok; }
+}
+
+// Funkcja teraz operuje na ogólnym interfejsie Figura.
+// Nieważne co podstawisz – wynik będzie przewidywalny.
+function wypiszPole(f: Figura) {
+    console.log("Pole wynosi: " + f.obliczPole());
+}
+
+wypiszPole(new Prostokat(10, 5)); // Pole wynosi: 50
+wypiszPole(new Kwadrat(10));      // Pole wynosi: 100
+Używaj kodu z rozwagą.
+
+Najważniejsza lekcja LSP
+Dziedziczenie powinno zachodzić tylko wtedy, gdy klasa pochodna w pełni zachowuje zachowanie klasy bazowej. Jeśli musisz rzucać błędem typu throw new Error("Ta metoda tutaj nie działa"), to prawdopodobnie łamiesz zasadę Liskov.
+Czy chcesz przejść do I, czyli Interface Segregation Principle (Zasada Segregacji Interfejsów)?
+Odpowiedzi wygenerowane przez AI mogą zawierać błędy. Więcej informacji
+
+
+
+
+dlaczego nie dziedziczenie kwadrat to szczegolny przyklad prostokata
+To jest najczęstsza pułapka! Matematycznie masz rację: każdy kwadrat to prostokąt. Jednak w programowaniu obiektowym (OOP) dziedziczenie dotyczy zachowania, a nie tylko definicji.
+Oto dlaczego dziedziczenie w tym przypadku łamie kod:
+1. Niespójność zachowania (Kontrakt)
+Klasa Prostokat obiecuje: "Możesz zmienić moją szerokość, a moja wysokość pozostanie bez zmian".
+Gdy Kwadrat dziedziczy po Prostokacie, musi tę obietnicę złamać, bo zmiana szerokości wymusza zmianę wysokości.
+2. Problem w teście (Zasada Podstawienia)
+Wyobraź sobie taką funkcję w Twoim systemie:
+typescript
+function sprawdzPole(p: Prostokat) {
+    p.ustawSzerokosc(10);
+    p.ustawWysokosc(5);
+    
+    // Programista oczekuje, że pole to 10 * 5 = 50
+    if (p.obliczPole() !== 50) {
+        throw new Error("Coś poszło nie tak z matematyką!");
+    }
+}
+Używaj kodu z rozwagą.
+
+Jeśli do tej funkcji przekażesz Kwadrat:
+Ustawiasz szerokość na 10 -> bok kwadratu staje się 10.
+Ustawiasz wysokość na 5 -> bok kwadratu staje się 5.
+obliczPole() zwróci 25, a nie 50.
+Program "wybuchnie", mimo że funkcja logicznie wydaje się poprawna dla każdego prostokąta.
+3. "Ukryte" zależności
+W Kwadrat extends Prostokat masz dwa pola danych (szerokosc, wysokosc), mimo że kwadrat potrzebuje tylko jednego (bok). Musisz pisać dodatkowy kod, żeby te dwa pola zawsze były równe (tzw. synchronizacja stanu), co prowadzi do błędów.
+Podsumowanie
+W świecie obiektowym relacja "jest rodzajem" (is-a) musi dotyczyć zachowania. Ponieważ Kwadrat nie zachowuje się jak Prostokat (blokuje niezależną zmianę boków), nie powinien po nim dziedziczyć.
+Chcesz teraz zobaczyć, jak Zasada Segregacji Interfejsów (ISP) chroni nas przed tworzeniem "zbyt grubych" obiektów?
+Odpowiedzi wygenerowane przez AI mogą zawierać błędy. Więcej informacji
+
+
+
+
+Interface Segregation Principle (Zasada Segregacji Interfejsów)
+Zasada Interface Segregation Principle (ISP) mówi prosto: Klient nie powinien być zmuszany do zależenia od metod, których nie używa.
+Lepiej stworzyć kilka małych, konkretnych interfejsów niż jeden wielki „kombajn”.
+❌ Złe podejście (Łamanie ISP)
+Tworzymy jeden wielki interfejs Pracownik. Problem pojawia się, gdy mamy pracownika, który np. nie koduje (HR) albo nie rekrutuje (Programista).
+typescript
+interface Pracownik {
+    koduj(): void;
+    rekrutuj(): void;
+    generujRaportFinansowy(): void;
+}
+
+class Programista implements Pracownik {
+    koduj() { console.log("Piszę kod..."); }
+    
+    // Zmuszamy programistę do implementacji czegoś, czego nie robi!
+    rekrutuj() { throw new Error("Nie potrafię rekrutować!"); }
+    generujRaportFinansowy() { throw new Error("Nie znam się na finansach!"); }
+}
+Używaj kodu z rozwagą.
+
+Tutaj łamiemy ISP, bo Programista musi wiedzieć o metodach, które są mu zbędne. Jeśli zmienimy sygnaturę rekrutuj(), będziemy musieli aktualizować klasę Programista, mimo że on w ogóle z tego nie korzysta.
+✅ Dobre podejście (Zgodne z ISP)
+Rozbijamy wielki interfejs na mniejsze, wyspecjalizowane role.
+typescript
+interface Programowalny {
+    koduj(): void;
+}
+
+interface Rekrutujacy {
+    rekrutuj(): void;
+}
+
+interface Raportujacy {
+    generujRaport(): void;
+}
+
+// Teraz każda klasa bierze tylko to, czego faktycznie potrzebuje:
+
+class Programista implements Programowalny {
+    koduj() { console.log("Piszę Typescript..."); }
+}
+
+class HRManager implements Rekrutujacy {
+    rekrutuj() { console.log("Szukam talentów..."); }
+}
+
+// A jeśli ktoś ma dwie role, może zaimplementować oba interfejsy:
+class TechLead implements Programowalny, Rekrutujacy {
+    koduj() { console.log("Trochę koduję..."); }
+    rekrutuj() { console.log("I rekrutuję zespół..."); }
+}
+Używaj kodu z rozwagą.
+
+Co zyskaliśmy?
+Odchudzone klasy: Klasy implementują tylko to, co jest im niezbędne.
+Bezpieczeństwo: Zmiana w logice rekrutacji nie wpływa na kod programisty.
+Czytelność: Od razu widzisz, jaką rolę w systemie pełni dany obiekt.
+Czy jesteś gotowy na ostatnią literę – D, czyli Dependency Inversion Principle (Zasada Odwrócenia Zależności)? Jest ona kluczowa dla nowoczesnych frameworków (jak Angular czy NestJS).
+Odpowiedzi wygenerowane przez AI mogą zawierać błędy. Więcej informacji
+
+
+
+
+tak
+Ostatnia litera, D, czyli Dependency Inversion Principle (DIP), to fundament nowoczesnego programowania. Zasada ta mówi dwie ważne rzeczy:
+Moduły wysokiego poziomu (logika biznesowa) nie powinny zależeć od modułów niskiego poziomu (szczegóły techniczne, np. konkretna baza danych). Oba powinny zależeć od abstrakcji.
+Abstrakcje nie powinny zależeć od szczegółów. To szczegóły powinny zależeć od abstrakcji.
+Brzmi skomplikowanie? Zobaczmy przykład w TypeScript.
+❌ Złe podejście (Łamanie DIP)
+Wyobraź sobie, że Twój sklep internetowy jest "na sztywno" połączony z MySQL. Jeśli zechcesz zmienić bazę na MongoDB, musisz przepisać całą logikę sklepu.
+typescript
+class MySQLDatabase {
+    save(data: string) {
+        console.log(`Zapisano w MySQL: ${data}`);
+    }
+}
+
+class Store {
+    private db: MySQLDatabase;
+
+    constructor() {
+        // BŁĄD: Store sam tworzy instancję konkretnej bazy.
+        // Jest od niej całkowicie zależny!
+        this.db = new MySQLDatabase();
+    }
+
+    purchase(item: string) {
+        this.db.save(item);
+    }
+}
+Używaj kodu z rozwagą.
+
+✅ Dobre podejście (Zgodne z DIP)
+Wprowadzamy interfejs (abstrakcję). Sklep nie wie, jakiej bazy używa – on po prostu wie, że baza potrafi "zapisać".
+typescript
+// 1. Definiujemy abstrakcję (interfejs)
+interface Database {
+    save(data: string): void;
+}
+
+// 2. Tworzymy konkretne implementacje (szczegóły)
+class MySQLDatabase implements Database {
+    save(data: string) {
+        console.log(`Zapisano w MySQL: ${data}`);
+    }
+}
+
+class MongoDatabase implements Database {
+    save(data: string) {
+        console.log(`Zapisano w MongoDB: ${data}`);
+    }
+}
+
+// 3. Moduł wysokiego poziomu zależy TYLKO od interfejsu
+class Store {
+    // "Wstrzykujemy" zależność przez konstruktor (Dependency Injection)
+    constructor(private db: Database) {}
+
+    purchase(item: string) {
+        this.db.save(item);
+    }
+}
+
+// WYWOŁANIE:
+const mySql = new MySQLDatabase();
+const storeWithSql = new Store(mySql); // Sklep używa SQL
+storeWithSql.purchase("Laptop");
+
+const mongo = new MongoDatabase();
+const storeWithMongo = new Store(mongo); // Ten sam sklep, inna baza!
+storeWithMongo.purchase("Telefon");
+
+
+Używaj kodu z rozwagą.
+
+Co zyskaliśmy?
+Łatwa wymiana części: Możesz podmienić bazę danych, system wysyłki e-maili czy API płatności bez dotykania logiki biznesowej.
+Testowalność: Do testów możesz stworzyć MockDatabase, która nic nie zapisuje, dzięki czemu testy będą błyskawiczne i bezpieczne.
+Odwrócenie sterowania: To Ty decydujesz na zewnątrz, czego użyje Store, a nie on sam.
+Gratulacje! Przeszedłeś przez cały SOLID. Która z tych zasad wydaje Ci się w tej chwili najtrudniejsza do wdrożenia w Twoim projekcie?
+Odpowiedzi wygenerowane przez AI mogą zawierać błędy. Więcej informacji
+
+
+
+
+Zapytaj, o co chcesz
+
+
+Odpowiedź trybu AI jest gotowa
+
