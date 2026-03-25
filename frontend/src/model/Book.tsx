@@ -1,4 +1,5 @@
 import { Item } from "./Item.tsx";
+
 export class Book extends Item {
     autor: string;
     isbn: string;
@@ -6,5 +7,8 @@ export class Book extends Item {
         super(id, tytul);
         this.autor = autor;
         this.isbn = isbn;
+    }
+    getCreator(): string {
+        return this.autor;
     }
 }

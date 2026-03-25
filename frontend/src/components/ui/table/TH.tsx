@@ -9,7 +9,7 @@ const TH = <T extends React.ReactNode,>({ items, keys }: ListProps<T>) => {
     return (
         <thead>
             <tr>{
-                items.map((t, i) => {
+                items.map((t) => {
                     return <th key={keys(t)}>{t}</th>
                 })
             }

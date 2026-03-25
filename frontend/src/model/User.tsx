@@ -1,4 +1,3 @@
-import type { Copy } from "./Copy";
 
 export type UserStatus = "admin" | "user";
 

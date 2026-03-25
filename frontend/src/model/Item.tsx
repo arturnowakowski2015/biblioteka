@@ -5,4 +5,5 @@ export abstract class Item {
         this.id = id;
         this.tytul = tytul;
     }
+    abstract getCreator(): string;
 }

@@ -21,7 +21,16 @@ export class LibraryManager {
             new Katalog([], [], "nazwa", "pusty katalog");
 
     }
+    // Symulacja computeIfAbsent
+    public getOrCreate<K, V>(map: Map<K, V>, key: K, factory: (k: K) => V): V {
+        if (!map.has(key)) {
+            map.set(key, factory(key));
+        }
+        return map.get(key)!;
+    }
 
+    // Użycie:
+    //const katalog = getOrCreate(catalogs, UserClass, (c) => new GenericKatalog(c.name));
     public static getManagerInstance(): LibraryManager {
         if (!LibraryManager.instance) {
             LibraryManager.instance = new LibraryManager();
@@ -31,6 +40,14 @@ export class LibraryManager {
 
     public getKatalog(): Katalog {
         return this.katalog;
+    }
+
+    public getLoans(): Loans[] {
+        return this.loans;
+    }
+
+    public getHistoryLoans(): LoansHistory[] {
+        return this.historyLoans;
     }
 
     // Metoda pomocnicza, którą warto mieć do zapisywania zmian

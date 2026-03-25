@@ -1,11 +1,6 @@
 .container {
     display: flex;
-    justify-content: center;
-    /* środek w poziomie */
-    align-items: center;
-    /* środek w pionie */
-    height: 100vh;
-    /* rodzic musi mieć wysokość */
+    flex-direction: column;
 }
 
 .sidebar {

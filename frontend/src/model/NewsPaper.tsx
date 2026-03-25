@@ -1,5 +1,6 @@
 import { Item } from "./Item.tsx";
 
+
 export class NewsPaper extends Item {
     numerWydania: number;
     dataPublikacji: Date;
@@ -7,5 +8,8 @@ export class NewsPaper extends Item {
         super(id, tytul);
         this.numerWydania = numer;
         this.dataPublikacji = dataPublikacji;
+    }
+    getCreator(): string {
+        return "Brak autora";
     }
 }

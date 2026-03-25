@@ -91,10 +91,10 @@ const Main = () => {
                 </header>
 
 
-                <section className="table-container">
-                    <h3>Ostatnie Transakcje</h3>
-                    <Outlet />
-                </section>
+
+                <h3>Ostatnie Transakcje</h3>
+                <Outlet />
+
             </main>
         </div>
 

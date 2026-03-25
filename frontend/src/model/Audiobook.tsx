@@ -8,4 +8,9 @@ export class Audiobook extends Item {
         this.timeLength = timeLength;
         this.lector = lector;
     }
+    getCreator(): string {
+        return this.lector;
+    }
+
+
 }

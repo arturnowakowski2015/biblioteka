@@ -9,19 +9,15 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode; // Pozwala na przekazywanie tekstu, ikonek, innych komponentów
 }
 
-const Button: React.FC<ButtonProps> = ({ 
-  variant = 'primary', 
-  children, 
-  className = '', 
+const Button: React.FC<ButtonProps> = ({
+  children,
   ...props // Tu trafiają: onClick, type, disabled, title itd.
 }) => {
   // Przykład prostego stylowania opartego na wariancie
-  const variantClass = `btn-${variant}`;
 
   return (
-    <button 
-      className={`base-button ${variantClass} ${className}`} 
-      {...props} 
+    <button className={`btn ${props.variant ? `btn-${props.variant}` : ''}`}
+      {...props}
     >
       {children}
     </button>
