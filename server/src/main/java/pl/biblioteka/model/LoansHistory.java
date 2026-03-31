@@ -12,7 +12,7 @@ public class LoansHistory {
 
     public LoansHistory() {
     }
-
+ 
     public LoansHistory(long id, long baseId, long userId, LocalDateTime from) {
         this.id = id;
         this.baseId = baseId;

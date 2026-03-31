@@ -12,7 +12,7 @@ public abstract class Item {
     protected Item(long id, String tytul) {
         this.id = id;
         this.tytul = tytul;
-    }
+    } 
 
     public long getId() {
         return id;

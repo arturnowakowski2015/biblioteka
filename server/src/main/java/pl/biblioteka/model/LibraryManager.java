@@ -18,9 +18,9 @@ public class LibraryManager {
     private static LibraryManager instance;
  
     private final Map<Class<? extends Item>, GenericKatalog<? extends Item>> catalogs = new ConcurrentHashMap<>();
- 
+  
     private final Map<Long, GenericCopy<? extends Item>> copiesById = new ConcurrentHashMap<>();
- 
+  
     private final List<GenericLoan<? extends Item>> genericLoans = new ArrayList<>();
     private List<GenericLoan<? extends Item>> loanHistory = new ArrayList<>(); 
     private List<User> users = new ArrayList<>();  

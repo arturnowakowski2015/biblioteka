@@ -14,7 +14,7 @@ public class Loan {
         this.id = id;
         this.whoHas = whoHas;
         this.whatHas = whatHas;
-    }
+    } 
 
     public long getId() {
         return id;

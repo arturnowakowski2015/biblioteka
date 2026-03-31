@@ -13,7 +13,7 @@ public class Auth {
     	if(instance==null)
     		instance= new Auth();
     	return instance;
-    }
+    } 
     public Auth(User currentUser) {
         this.currentUser = currentUser;
     }

@@ -12,7 +12,7 @@ public class LibraryResponse {
 	public void setAuthor(String author) {
 		this.author = author;
 	}
-
+ 
 	private String tytul;
     public String getTytul() {
 		return tytul;

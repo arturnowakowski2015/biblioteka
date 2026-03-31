@@ -9,7 +9,7 @@ public class NewsPaper extends Item {
 
     public NewsPaper() {
     }
-
+ 
     public NewsPaper(long id, String tytul, int numerWydania, LocalDate dataPublikacji) {
         super(id, tytul);
         this.numerWydania = numerWydania;

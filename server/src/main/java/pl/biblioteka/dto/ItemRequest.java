@@ -7,7 +7,7 @@ public class ItemRequest {
 	private String isbn;
 	public long getId() {
 		return id;
-	}
+	} 
 	public void setId(long id) {
 		this.id = id;
 	}
