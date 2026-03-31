@@ -17,7 +17,7 @@ public class Auth {
     public Auth(User currentUser) {
         this.currentUser = currentUser;
     }
-
+//
     public void login(User user) {
         this.currentUser = user;
     }

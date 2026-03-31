@@ -4,4 +4,4 @@ public enum CopyStatus {
     AVAILABLE,
     BORROWED,
     RESERVED
-} 
+} //

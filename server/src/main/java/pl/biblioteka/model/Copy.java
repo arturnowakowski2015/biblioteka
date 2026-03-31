@@ -14,7 +14,7 @@ public class Copy {
         this.id = id;
         this.itemId = itemId;
     }
- 
+ //
     public Copy(long id, long itemId, CopyStatus status) {
         this.id = id;
         this.itemId = itemId;

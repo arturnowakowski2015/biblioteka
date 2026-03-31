@@ -13,7 +13,7 @@ public abstract class Item {
         this.id = id;
         this.tytul = tytul;
     } 
-
+//
     public long getId() {
         return id;
     }

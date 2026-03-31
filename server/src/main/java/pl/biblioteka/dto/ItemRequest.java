@@ -1,5 +1,5 @@
 package pl.biblioteka.dto;
-
+//
 public class ItemRequest {
 	private long id;
 	private String author;

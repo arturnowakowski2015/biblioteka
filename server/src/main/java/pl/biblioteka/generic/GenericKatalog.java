@@ -13,7 +13,7 @@ public class GenericKatalog<T extends Item> {
     private final List<GenericCopy<T>> copies = new ArrayList<>();
      private String nazwa = "";
     private String opis = "";
-
+//
     public GenericKatalog() { }
     public GenericKatalog(String nazwa, String opis) { this.nazwa = nazwa; this.opis = opis; }
 

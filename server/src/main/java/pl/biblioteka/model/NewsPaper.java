@@ -14,7 +14,7 @@ public class NewsPaper extends Item {
         super(id, tytul);
         this.numerWydania = numerWydania;
         this.dataPublikacji = dataPublikacji;
-    }
+    }//
 
     public int getNumerWydania() {
         return numerWydania;

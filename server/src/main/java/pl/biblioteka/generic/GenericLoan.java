@@ -13,7 +13,7 @@ public class GenericLoan<T extends pl.biblioteka.model.Item> {
 		this.from = from;
 	}
 	private LocalDateTime end;
-
+//
     public GenericLoan(long id, User whoHas, GenericCopy<T> whatHas, LocalDateTime from) {
         this.id = id;
         this.whoHas = whoHas;

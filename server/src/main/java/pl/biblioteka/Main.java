@@ -35,5 +35,5 @@ public class Main {
         manager.borrowGenericCopy(1003L, admin.getId(), 3L);
 
         System.out.println("Zalogowany użytkownik: " + auth.getCurrentUser());
-    }
+    }//
 }

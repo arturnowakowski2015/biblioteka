@@ -4,7 +4,7 @@ import pl.biblioteka.model.Item;
 import pl.biblioteka.model.CopyStatus;
 
 import java.util.Objects;
- 
+ //
 public class GenericCopy<T extends Item> {
     private long id;
     private long itemId;

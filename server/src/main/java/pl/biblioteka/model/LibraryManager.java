@@ -96,7 +96,7 @@ public class LibraryManager {
         if (loanOpt.isEmpty()) {
             return false;
         }
-
+//
         GenericLoan<? extends Item> loan = loanOpt.get();
         loan.getWhatHas().setStatus(CopyStatus.AVAILABLE);
         genericLoans.remove(loan);
