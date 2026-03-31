@@ -7,10 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-/**
- * Generyczny katalog przechowujący elementy typu T i ich kopie GenericCopy<T>.
- */
+ 
 public class GenericKatalog<T extends Item> {
     private final List<T> items = new ArrayList<>();
     private final List<GenericCopy<T>> copies = new ArrayList<>();

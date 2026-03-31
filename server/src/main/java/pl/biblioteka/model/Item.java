@@ -29,15 +29,13 @@ public abstract class Item {
     public void setTytul(String tytul) {
         this.tytul = tytul;
     }
-
-    // New: uniform author accessor for all Item types (may return null if not applicable)
+ 
     public String getAuthor() {
         return null; // default: no author
     }
-
-    // New: uniform author setter for all Item types (no-op by default)
+ 
     public void setAuthor(String author) {
-        // default: item type doesn't support author
+    
     }
 
     @Override

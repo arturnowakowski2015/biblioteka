@@ -16,16 +16,14 @@ import pl.biblioteka.generic.GenericLoan;
 
 public class LibraryManager {
     private static LibraryManager instance;
-
-    // New generic catalogs map (option C)
+ 
     private final Map<Class<? extends Item>, GenericKatalog<? extends Item>> catalogs = new ConcurrentHashMap<>();
-    // Global index of copies by id for fast lookup
+ 
     private final Map<Long, GenericCopy<? extends Item>> copiesById = new ConcurrentHashMap<>();
-    // Generic loans list
+ 
     private final List<GenericLoan<? extends Item>> genericLoans = new ArrayList<>();
-    private List<GenericLoan<? extends Item>> loanHistory = new ArrayList<>();
-    // --- old non-generic fields (kept for compatibility, usage commented out) ---
-    private List<User> users = new ArrayList<>(); // Inicjalizacja!
+    private List<GenericLoan<? extends Item>> loanHistory = new ArrayList<>(); 
+    private List<User> users = new ArrayList<>();  
     private List<Loan> loans;
     
 
@@ -35,8 +33,7 @@ public class LibraryManager {
         }
         return instance;
     }
-
-    // Generic accessor: returns a GenericKatalog for the requested subclass of Item (lazy init)
+ 
     @SuppressWarnings("unchecked")
     public <T extends Item> GenericKatalog<T> getKatalog(Class<T> clazz) {
         return (GenericKatalog<T>) catalogs.computeIfAbsent(clazz, c -> new GenericKatalog<>(c.getSimpleName(), ""));
@@ -51,8 +48,7 @@ public class LibraryManager {
     public void addUser(User user) {
         users.add(user);
     }
-
-    // New: register item into appropriate generic catalog and create a GenericCopy
+ 
     @SuppressWarnings({"unchecked", "rawtypes"})
     public <T extends Item> GenericCopy<T> registerItemInCatalog(Class<T> clazz,T item, User user) {
         if (item == null) return null;
@@ -64,8 +60,7 @@ public class LibraryManager {
         copiesById.put(nextId, copy);
         return copy;
     }
-
-    // New: find generic copy quickly
+ 
     public Optional<GenericCopy<? extends Item>> findGenericCopyById(long copyId) {
         return Optional.ofNullable(copiesById.get(copyId));
     }
@@ -73,8 +68,7 @@ public class LibraryManager {
     public Map<Long, GenericCopy<? extends Item>> getAllOfCopies(){
     	return this.copiesById;
     }
-
-    // New: borrow generic copy (returns a GenericLoan)
+ 
     public Optional<GenericLoan<? extends Item>> borrowGenericCopy(long loanId, long userId, long copyId) {
         Optional<User> userOpt = users.stream().filter(user -> user.getId() == userId).findFirst();
         GenericCopy<? extends Item> copy = copiesById.get(copyId);
@@ -89,13 +83,11 @@ public class LibraryManager {
 
         copy.setStatus(CopyStatus.BORROWED);
         GenericLoan<? extends Item> gLoan = new GenericLoan<>(loanId, userOpt.get(), copy, LocalDateTime.now());
-        genericLoans.add(gLoan);
-        // maintain legacy history for compatibility
+        genericLoans.add(gLoan); 
  
         return Optional.of(gLoan);
     }
-
-    // New: return generic copy
+ 
     public boolean returnGenericCopy(long copyId) {
         Optional<GenericLoan<? extends Item>> loanOpt = genericLoans.stream()
             .filter(loan -> loan.getWhatHas() != null && loan.getWhatHas().getId() == copyId)
@@ -113,92 +105,29 @@ public class LibraryManager {
         return true;
     }
  
-    // --- Legacy API: old methods are preserved here but their implementations are commented out
-    // This keeps source history and allows rollback if needed.
-
-    /*
-    public void addItem(Item item, User user) {
-        katalog.registerItem(item, user);
-    }
-    */
-
-    /*
-    public Optional<Loan> borrowCopy(long loanId, long userId, long copyId) {
-        Optional<User> userOpt = users.stream().filter(user -> user.getId() == userId).findFirst();
-        Optional<Copy> copyOpt = katalog.getAllOfCopies().stream().filter(copy -> copy.getId() == copyId).findFirst();
-
-        if (userOpt.isEmpty() || copyOpt.isEmpty()) {
-            return Optional.empty();
-        }
-
-        Copy copy = copyOpt.get();
-        if (copy.getStatus() != CopyStatus.AVAILABLE) {
-            return Optional.empty();
-        }
-
-        copy.setStatus(CopyStatus.BORROWED);
-        Loan loan = new Loan(loanId, userOpt.get(), copy);
-        loans.add(loan);
-        historyLoans.add(new LoansHistory(loanId, copy.getId(), userId, LocalDateTime.now()));
-
-        return Optional.of(loan);
-    }
-    */
-
-    /*
-    public boolean returnCopy(long copyId) {
-        Optional<Loan> loanOpt = loans.stream()
-            .filter(loan -> loan.getWhatHas() != null && loan.getWhatHas().getId() == copyId)
-            .findFirst();
-
-        if (loanOpt.isEmpty()) {
-            return false;
-        }
-
-        Loan loan = loanOpt.get();
-        loan.getWhatHas().setStatus(CopyStatus.AVAILABLE);
-        loans.remove(loan);
-
-        historyLoans.stream()
-            .filter(history -> history.getBaseId() == loan.getWhatHas().getItemId()
-                && history.getUserId() == loan.getWhoHas().getId()
-                && history.getEnd() == null)
-            .findFirst()
-            .ifPresent(history -> history.setEnd(LocalDateTime.now()));
-
-        return true;
-    }
-    */
+    
     public List<GenericLoan<? extends Item>> getLoansHistory(){
     	return this.genericLoans;
     }
     
-    
- // nie ma takiej kopii
- // nic do zrobienia
- // 1) Zaktualizuj globalną kopię
-    // 2) Zaktualizuj kopię w generycznym katalogu (jeśli można go znaleźć)
- // Przykład (pseudokod dostosowany do Twoich pól w LibraryManager)
-
-    
+     
     
     
     public boolean updateCopyStatus(long copyId, CopyStatus newStatus) {
-        synchronized (this) { // prosty lock; możesz użyć bardziej fine-grained locków
+        synchronized (this) { 
             GenericCopy<?> copy = copiesById.get(copyId);
             if (copy == null) {
-                return false; // nie ma takiej kopii
+                return false;  
             }
 
             CopyStatus oldStatus = copy.getStatus();
             if (oldStatus == newStatus) {
-                return true; // nic do zrobienia
+                return true;  
             }
 
-            // 1) Zaktualizuj globalną kopię
+           
             copy.setStatus(newStatus);
-
-            // 2) Zaktualizuj kopię w generycznym katalogu (jeśli można go znaleźć)
+ 
             Item item = copy.getItem();
             if (item != null) {
                 Class<? extends Item> clazz = item.getClass();
@@ -206,29 +135,24 @@ public class LibraryManager {
                 if (katalog != null) {
                     katalog.getCopy(copyId).ifPresent(c -> c.setStatus(newStatus));
                 }
-            } else {
-                // jeśli brak referencji item, przeszukaj katalogi po copyId (opsjonalne, kosztowne)
+            } else { 
                 for (GenericKatalog<? extends Item> k : catalogs.values()) {
                     k.getCopy(copyId).ifPresent(c -> c.setStatus(newStatus));
                 }
             }
-
-            // 3) Zaktualizuj aktywne pożyczki i historię:
+ 
             Optional<GenericLoan<? extends Item>> loanOpt = genericLoans.stream()
                 .filter(l -> l.getWhatHas() != null && l.getWhatHas().getId() == copyId)
                 .findFirst();
 
-            if (newStatus == CopyStatus.AVAILABLE) {
-                // zwrot: zakończ pożyczkę i uzupełnij historię
+            if (newStatus == CopyStatus.AVAILABLE) { 
                 if (loanOpt.isPresent()) {
                     GenericLoan<?> loan = loanOpt.get();
                     loan.setEnd(LocalDateTime.now());
                     genericLoans.remove(loan);
  
                 }
-            } else if (newStatus == CopyStatus.BORROWED) {
-                // wypożyczenie: tutaj zwykle tworzymy loan w innej metodzie (wymaga usera)
-                // jeśli istnieje pożyczka - sprawdź spójność; inaczej pozostaw bez tworzenia loan
+            } else if (newStatus == CopyStatus.BORROWED) { 
             }
  
             return true;
@@ -241,9 +165,7 @@ public class LibraryManager {
         return genericLoans.stream()
                 .filter(loan -> loan.getId() == loanId)
                 .findFirst()
-                .map(loan -> {
-                    // Tutaj logika aktualizacji, np.:
-                    // loan.setStatus(newStatus); 
+                .map(loan -> { 
                     long copyId = loan.getWhatHas().getId();
                     GenericCopy<? extends Item> copy = copiesById.get(copyId);
                     copy.setStatus(CopyStatus.valueOf(newStatus));
@@ -262,7 +184,7 @@ public class LibraryManager {
                     }
                     return true;
                 })
-                .orElse(false); // Zwraca false, jeśli nie znaleziono pożyczki
+                .orElse(false);  
         
     }
     
@@ -276,33 +198,7 @@ public class LibraryManager {
         if (idd.isPresent()) {
             long ids = idd.get().getWhatHas().getId();        }
         return true;
-    }
-    // Existing updateItem kept as-is (works with old katalog). You can migrate it to generic variant if needed.
-//    public boolean updateItem(long id,LibraryResponse ir) {
-//        System.out.println("/////  " + katalog.getAllItems() + "\n" + this.historyLoans.toString() + "///" + id);
-//        Optional<LoansHistory> idd = this.getHistoryLoans().stream().filter(t -> t.getId() == id).findFirst();
-//        if (idd.isPresent()) {
-//            long ids = idd.get().getBaseId();
-//            Optional<Copy> res = katalog.getAllOfCopies().stream().filter(t -> t.getId() == ids).findFirst();
-//            if (res.isPresent()) {
-//                long it = res.get().getItemId();
-//                Optional<Item> itemOpt = katalog.getItem(it);
-//                if (itemOpt.isPresent()) {
-//                    Item item = itemOpt.get();
-//                    // Update title if provided
-//                    if (ir.getTytul() != null && !ir.getTytul().isBlank()) {
-//                        item.setTytul(ir.getTytul());
-//                    }
-//                    // Update author generically
-//                    if (ir.getAuthor() != null) {
-//                        item.setAuthor(ir.getAuthor());
-//                    }
-//                    return true;
-//                }
-//            }
-//        }
-//        return false;
-//    }
+    } 
 
 	@Override
 	public int hashCode() {

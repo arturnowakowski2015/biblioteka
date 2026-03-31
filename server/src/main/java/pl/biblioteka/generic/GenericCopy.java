@@ -4,11 +4,7 @@ import pl.biblioteka.model.Item;
 import pl.biblioteka.model.CopyStatus;
 
 import java.util.Objects;
-
-/**
- * Generyczna kopia powiązana z elementem typu T.
- * Przechowuje zarówno itemId (persist-friendly), jak i opcjonalną referencję do itemu (runtime convenience).
- */
+ 
 public class GenericCopy<T extends Item> {
     private long id;
     private long itemId;

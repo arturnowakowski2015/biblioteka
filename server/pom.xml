@@ -2,60 +2,46 @@
 <project xmlns="http://maven.apache.org"
          xmlns:xsi="http://www.w3.org"
          xsi:schemaLocation="http://maven.apache.org http://maven.apache.org">
-    <modelVersion>4.0.0</modelVersion>
-
-    <!-- 1. Sekcja PARENT (tylko Spring Boot) -->
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.4</version>
-        <relativePath/> 
-    </parent>
-
-    <!-- 2. Twoje dane projektu (to co będzie widoczne na GitHub) -->
-    <groupId>com.arturnowakowski</groupId>
-    <artifactId>server-app</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>server-app</name>
-
-    <!-- 3. Konfiguracja publikowania do GitHub Packages -->
-    <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>GitHub Packages</name>
-            <!-- Zmieniony URL na poprawny dla Maven Registry -->
-            <url>https://maven.pkg.github.com/arturnowakowski2015/biblioteka</url>
-        </repository>
-    </distributionManagement>
-
-    <properties>
-        <java.version>21</java.version>
-    </properties>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <!-- Hibernate (Spring Boot 3 zazwyczaj ma go już w starter-data-jpa) -->
-        <dependency>
-            <groupId>org.hibernate.orm</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>6.4.4.Final</version>
-        </dependency>
-        <!-- Sterownik PostgreSQL -->
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-        </dependency>
-    </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
+           <modelVersion>4.0.0</modelVersion>
+               <parent>
+			        <groupId>org.springframework.boot</groupId>
+			        <artifactId>spring-boot-starter-parent</artifactId>
+			        <version>3.2.4</version>
+			    </parent>
+				  <groupId>aa</groupId>
+				  <artifactId>aa</artifactId>
+				  <version>0.0.1-SNAPSHOT</version>
+				  
+				  <dependencies>
+				     <dependency>
+			            <groupId>org.springframework.boot</groupId>
+			            <artifactId>spring-boot-starter-web</artifactId>
+			        </dependency>
+				    <!-- Hibernate -->
+				    <dependency>
+				        <groupId>org.hibernate.orm</groupId>
+				        <artifactId>hibernate-core</artifactId>
+				        <version>6.4.4.Final</version>
+				    </dependency>
+				    <!-- Sterownik PostgreSQL -->
+				    <dependency>
+				        <groupId>org.postgresql</groupId>
+				        <artifactId>postgresql</artifactId>
+				        <version>42.7.2</version>
+				    </dependency>
+				</dependencies>
+				  <build>
+				    <sourceDirectory>src</sourceDirectory>
+				    <plugins>
+				      <plugin>
+				        <artifactId>maven-compiler-plugin</artifactId>
+				        <version>3.13.0</version>
+				        <configuration>
+				          <release>21</release>
+				        </configuration>
+				      </plugin>
+				    </plugins>
+				  </build>
 </project>
+
+

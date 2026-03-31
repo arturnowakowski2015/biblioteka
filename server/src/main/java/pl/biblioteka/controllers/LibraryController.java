@@ -37,14 +37,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 	    allowedHeaders = "*"
 	)
 @RestController
-@RequestMapping("/library") // Wszystkie metody poniżej zaczną się od /library
+@RequestMapping("/library")
 public class LibraryController {
  
 	
 	@GetMapping("/loans")     // Endpoint: /library/loans
     public List<LibraryResponse> getLibraryData() {
-        // Tutaj normalnie wywołałbyś swoją metodę borrowCopy, 
-        // ale na potrzeby endpointu zwracamy gotowe dane:
         LibraryManager m = LibraryManager.getInstance();
        List<LibraryResponse> loans = m.getLoansHistory().stream()
     		    .map(t -> {
@@ -53,13 +51,13 @@ public class LibraryController {
     		         String status = m.getAllOfCopies().values().stream()
     		        		    .filter(copy -> copy.getId() == t.getWhatHas().getId()) 
     		            .findFirst()
-    		            .map(copy -> copy.getStatus().toString()) // Zamiana na String
-    		            .orElse("UNKNOWN"); // Co jeśli nie znalez iono kopii?
+    		            .map(copy -> copy.getStatus().toString())  
+    		            .orElse("UNKNOWN");  
 
-    		        // 2. Tworzymy i zwracamy nowy obiekt DTO
+    		       
     		        return new LibraryResponse(
     		            t.getId(),
-    		            // Map Item -> author: handle Book (autor) and Audiobook (lector)
+    		             
     		            m.getKatalog(t.getWhatHas().getItem().getClass()).getAllItems().stream()
     		                .filter(it -> it.getId()== t.getId())
     		                .findFirst()
@@ -75,7 +73,7 @@ public class LibraryController {
     		                .orElse("nieznany tytul"),
     		                 
     		            status,
-    		            t.getFrom().toString(), // Zamiana daty na tekst ISO
+    		            t.getFrom().toString(), 
     		            t.getEnd() != null ? t.getEnd().toString() : "ACTIVE"
     		        );
     		    })
@@ -91,7 +89,7 @@ public class LibraryController {
 	public ResponseEntity<String> saveLoans(@RequestBody List<ItemRequest> incomingLoans) {
  		incomingLoans.forEach(t->System.out.println(">>>>>>>>>>>>>   "+t.toString()));
     try {
-	        // 'm' to Twoja instancja managera (LibraryManager)
+	        
 	        LibraryManager m = LibraryManager.getInstance();
 	        User admin = new User(1L, "Jan", "Nowak", "jan.nowak@biblioteka.pl", UserRole.ADMIN);
 	        Auth auth = new Auth();
@@ -107,14 +105,14 @@ public class LibraryController {
 	            try {
 	                User user = auth.getCurrentUser();
 	                if (user == null) {
- 	                    break; // Przerwij, jeśli nie ma użytkownika
+ 	                    break;  
 	                }
 	                
 	                m.registerItemInCatalog(Book.class,new Book(f,loan.getTitle() ,loan.getAuthor() , loan.getIsbn()), user);
 	                m.borrowGenericCopy(f++, admin.getId(), ++id);
 	            } catch (Throwable t) {
 	                System.out.println("KATASTROFA przy " + i + ": " + t.getMessage());
-	                t.printStackTrace(); // To wypisze CAŁY błąd w konsoli
+	                t.printStackTrace();  
 	            }
 	        }
 	        										
@@ -126,7 +124,7 @@ public class LibraryController {
 	}
  	
  	
-  	@PutMapping("/items/{id}") // {id} to zmienna w ścieżce
+  	@PutMapping("/items/{id}")  
     public  boolean updateItem(
         @PathVariable long id,            
         @RequestBody LibraryResponse updatedData  
