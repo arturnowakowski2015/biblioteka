@@ -20,7 +20,7 @@ public class LoansHistory {
         this.from = from;
     }
 
-    public long getId() {
+    public long getId() { 
         return id;
     }
 

@@ -14,14 +14,12 @@ function App() {
   return (
 
 
-    // Tworzymy instancję klienta
+    //compound komponents
     <QueryClientProvider client={queryClient}>
       <LibraryProvider>
         <Routes>
-          {/* Rodzic: Ścieżka /dashboard */}
           <Route path="auth" element={<Auth />} />
           <Route path="/" element={<Main />}>
-            {/* Dzieci: Renderowane wewnątrz <Dashboard /> w miejscu <Outlet /> */}
             <Route path="order" element={<Order />} />
             <Route path="admin" element={<Admin />} />
             <Route path="books" element={<Books />} />

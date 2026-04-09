@@ -1,6 +1,11 @@
 package pl.biblioteka.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+
+import pl.biblioteka.generic.GenericLoan;
 
 public class User {
     private long id;
@@ -8,7 +13,8 @@ public class User {
     private String surname;
     private String email;
     private UserRole status;
-
+    private Integer maxActiveLoans;
+ 
     public User() {
     }
  //
@@ -27,7 +33,8 @@ public class User {
         this.email = email;
         this.status = status;
     }
-
+  
+ 
     public long getId() {
         return id;
     }
@@ -72,6 +79,26 @@ public class User {
         return status == UserRole.ADMIN;
     }
 
+    public boolean increaseMaxActiveLoans() {
+    	if(this.maxActiveLoans<5) {
+    		this.maxActiveLoans++;
+    		return true;
+    	}
+    	return false;
+    }
+    
+    public boolean decreaseMaxActiveLoans() {
+    	if(this.maxActiveLoans>0) {
+    		this.maxActiveLoans--;
+    		return true;
+    	}
+    	return false;
+    }
+	public int getMaxActiveLoans() {
+		// TODO Auto-generated method stub
+		return this.maxActiveLoans;
+	}
+	
     @Override
     public String toString() {
         return "User{" +
@@ -102,4 +129,5 @@ public class User {
     public int hashCode() {
         return Objects.hash(id, name, surname, email, status);
     }
+
 }

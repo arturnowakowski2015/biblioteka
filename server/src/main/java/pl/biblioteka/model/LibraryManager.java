@@ -2,6 +2,7 @@ package pl.biblioteka.model;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -13,6 +14,7 @@ import pl.biblioteka.dto.LibraryResponse;
 import pl.biblioteka.generic.GenericKatalog;
 import pl.biblioteka.generic.GenericCopy;
 import pl.biblioteka.generic.GenericLoan;
+import pl.biblioteka.generic.Booking;
 
 public class LibraryManager {
     private static LibraryManager instance;
@@ -24,7 +26,10 @@ public class LibraryManager {
     private final List<GenericLoan<? extends Item>> genericLoans = new ArrayList<>();
     private List<GenericLoan<? extends Item>> loanHistory = new ArrayList<>(); 
     private List<User> users = new ArrayList<>();  
-    private List<Loan> loans;
+     
+     private final Booking<? extends Item> booking = new Booking<>();
+    
+    
     
 
     public static synchronized LibraryManager getInstance() {
@@ -48,7 +53,24 @@ public class LibraryManager {
     public void addUser(User user) {
         users.add(user);
     }
- 
+  
+    public boolean bookCopy(long copyId) {
+        GenericCopy<? extends Item> copy = copiesById.get(copyId);
+        if (copy == null) return false;  
+
+        // Szukamy aktywnego wypożyczenia dla tej kopii
+        Optional<GenericLoan<? extends Item>> loan = this.genericLoans.stream()
+                .filter(t -> t.getWhatHas().getId() == copyId)
+                .findFirst();
+        if (loan.isPresent()) {
+            // Jeśli jest wypożyczona, dodajemy rezerwację dla osoby, która ją aktualnie ma
+            // Uwaga: copyReservation przyjmuje List<User>, więc używamy computeIfAbsent
+            this.booking.addCopyToBooking(loan.get().getWhatHas(),loan.get().getWhoHas());
+            return true;
+        }
+
+        return false;
+    }
     @SuppressWarnings({"unchecked", "rawtypes"})
     public <T extends Item> GenericCopy<T> registerItemInCatalog(Class<T> clazz,T item, User user) {
         if (item == null) return null;
@@ -69,6 +91,11 @@ public class LibraryManager {
     	return this.copiesById;
     }
  
+    private int countActiveLoansForUser(long userId) {
+        return (int) genericLoans.stream()
+            .filter(l -> l.getWhoHas() != null && l.getWhoHas().getId() == userId && l.getEnd() == null)
+            .count();
+    }
     public Optional<GenericLoan<? extends Item>> borrowGenericCopy(long loanId, long userId, long copyId) {
         Optional<User> userOpt = users.stream().filter(user -> user.getId() == userId).findFirst();
         GenericCopy<? extends Item> copy = copiesById.get(copyId);
@@ -77,16 +104,34 @@ public class LibraryManager {
             return Optional.empty();
         }
 
-        if (copy.getStatus() != CopyStatus.AVAILABLE) {
-            return Optional.empty();
-        }
+        User user = userOpt.get();
 
-        copy.setStatus(CopyStatus.BORROWED);
-        GenericLoan<? extends Item> gLoan = new GenericLoan<>(loanId, userOpt.get(), copy, LocalDateTime.now());
-        genericLoans.add(gLoan); 
- 
-        return Optional.of(gLoan);
+        // synchronizacja per-user, żeby uniknąć wyścigów wypożyczeń dla tego samego użytkownika
+        synchronized (user) {
+            // policz aktywne wypożyczenia
+            int active = countActiveLoansForUser(userId);
+            int limit = user.getMaxActiveLoans(); // albo stała DEFAULT_MAX jeśli preferujesz globalny limit
+
+            if (active >= limit) {
+                // limit osiągnięty — odrzucamy wypożyczenie
+                return Optional.empty();
+            }
+
+            if (copy.getStatus() != CopyStatus.AVAILABLE) {
+                return Optional.empty();
+            }
+
+            copy.setStatus(CopyStatus.BORROWED);
+            GenericLoan<? extends Item> gLoan = new GenericLoan<>(loanId, user, copy, LocalDateTime.now());
+            genericLoans.add(gLoan);
+            user.increaseMaxActiveLoans();
+            // opcjonalnie: jeśli chcesz, utrzymuj też listę w User (jeśli ją dodasz)
+            // user.addLoan(gLoan);
+
+            return Optional.of(gLoan);
+        }
     }
+
  
     public boolean returnGenericCopy(long copyId) {
         Optional<GenericLoan<? extends Item>> loanOpt = genericLoans.stream()
@@ -100,8 +145,10 @@ public class LibraryManager {
         GenericLoan<? extends Item> loan = loanOpt.get();
         loan.getWhatHas().setStatus(CopyStatus.AVAILABLE);
         genericLoans.remove(loan);
- 
-
+        
+         
+        Optional<User> user = this.users.stream().filter(t->t.getId() == loan.getWhoHas().getId()).findFirst();
+        user.ifPresent(t->t.decreaseMaxActiveLoans());
         return true;
     }
  
@@ -174,7 +221,6 @@ public class LibraryManager {
                     cat.getCopy(copyId).ifPresent(t->t.setStatus(CopyStatus.valueOf(newStatus)));
                     if(CopyStatus.valueOf(newStatus)==CopyStatus.AVAILABLE) {
                     	loan.setEnd(LocalDateTime.now());
-                      	loan.setEnd(null);
                     	genericLoans.remove(loan);	
                     }
                     if(CopyStatus.valueOf(newStatus)==CopyStatus.BORROWED) {
@@ -200,31 +246,25 @@ public class LibraryManager {
         return true;
     } 
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(catalogs, copiesById, genericLoans, loanHistory, loans, users);
-	}
+    public boolean renewBooking(long loanid) {
+        Optional<GenericLoan<? extends Item>> loan = this.genericLoans.stream().filter(t -> t.getId() == loanid).findFirst();
+        if(loan.isPresent()) {
+        	loan.get().renew();
+        	return true;
+        }
+        return false;
+    }
+    public Optional<List<GenericLoan<? extends Item>>> checkOverDues() {
+        List<GenericLoan<? extends Item>> overdues = this.genericLoans.stream()
+                .filter(t -> t.getOverDue()==true)
+                .toList();   
+        return overdues.isEmpty() ? Optional.empty() : Optional.of(overdues);
+    }
+ 
+     
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		LibraryManager other = (LibraryManager) obj;
-		return Objects.equals(catalogs, other.catalogs) && Objects.equals(copiesById, other.copiesById)
-				&& Objects.equals(genericLoans, other.genericLoans) && Objects.equals(loanHistory, other.loanHistory)
-				&& Objects.equals(loans, other.loans) && Objects.equals(users, other.users);
-	}
-
-	@Override
-	public String toString() {
-		return "LibraryManager [catalogs=" + catalogs + ", copiesById=" + copiesById + ", genericLoans=" + genericLoans
-				+ ", loanHistory=" + loanHistory + ", users=" + users + ", loans=" + loans + "]";
-	}
-
+ 
+ 
 	 
  
   
