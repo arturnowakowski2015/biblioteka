@@ -1,0 +1,134 @@
+List<Double> list = Arrays.asList(2.22, 6000.44, null);
+
+list.stream()
+    .filter(Objects::nonNull) // Pozbywamy się nulli z listy
+    .filter(t -> t > 5000)    // Filtrujemy wysokie kwoty
+    .forEach(t -> System.out.println("Wysoka pensja: " + t));
+    
+    
+    Map<Integer, List<String>> grupyPoDlugosci = loginy.stream()
+    .collect(Collectors.groupingBy(String::length));
+// Wynik: {5=[admin, user1], 9=[moderator]}
+
+
+
+List<Integer> liczby = Arrays.asList(42, 12, 89, 7, 55);
+
+Optional<Integer> min = liczby.stream()
+                              .min(Integer::compare);
+
+// Wyciąganie wartości z Optionala:
+if (min.isPresent()) {
+    System.out.println("Najmniejsza liczba to: " + min.get()); // Wynik: 7
+}
+
+// Lub krócej (jeśli brak, zwróć 0):
+Integer wynik = min.orElse(0);
+
+
+
+
+
+
+
+
+
+
+
+
+// Błędnie: list.stream().sum() -> Błąd kompilacji
+// Poprawnie:
+int suma = list.stream()
+               .mapToInt(Integer::intValue) // zamiana obiektu Integer na typ int
+               .sum();
+               
+               
+               
+               
+          
+          
+          // Poprawnie:
+String result = list.stream()
+    .filter(t -> t.length() > 10)
+    .findAny()                   // Zwraca Optional<String>
+    .orElse("nnn");              // Jeśli pusty, daj "nnn"
+    
+    
+    
+    
+    
+    
+    
+    
+    Integer l = list.stream()
+    .filter(t -> t % 7 == 0)
+    .findFirst()         // Tu mamy Optional<Integer>
+    .map(t -> t * 10)    // Mapujemy środek Optionala (tylko jeśli coś w nim jest)
+    .orElse(0);          // Na samym końcu decydujemy, co jeśli pusto
+    filter przed find: Zawsze najpierw filtrujesz strumień, a potem "chwytasz" wynik przez findFirst() lub findAny().
+Mapowanie Optionala: Metoda .map() na Optionalu jest genialna, bo wykona się tylko wtedy, gdy element został znaleziony. Jeśli filter nic nie znajdzie, map zostanie bezpiecznie pominięty.
+get() to ostateczność: Unikaj .get(), dopóki nie sprawdzisz .isPresent(). Lepiej używać orElse, orElseGet lub map.
+
+
+
+
+
+
+
+
+
+
+Optional<String> name = Optional.of("jan");
+
+// Bezpośrednio na Optionalu:
+Optional<String> result = name
+    .filter(t -> t.length() > 2)
+    .map(String::toUpperCase);
+
+System.out.println(result.orElse("Za krótkie")); // Wynik: "JAN"
+
+
+
+
+
+Map<String, Double> sredniePensje = pracownicy.stream()
+    .collect(Collectors.groupingBy(
+        Pracownik::getDzial, 
+        Collectors.averagingDouble(Pracownik::getPensja)
+    ));
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    copiesById.entrySet().stream()
+    .forEach(entry -> {
+        Long id = entry.getKey();
+        GenericCopy<? extends Item> copy = entry.getValue();
+        System.out.println("ID: " + id + ", Copy: " + copy);
+    });
+    
+    
+    
+    
+    Map<Long, ? extends Item> itemsById = copiesById.entrySet().stream()
+    .collect(Collectors.toMap(
+        Map.Entry::getKey,
+        entry -> entry.getValue().getItem() // zakładając, że GenericCopy ma metodę getItem()
+    ));
+    
+    
+    
+    
+    
+    Optional<GenericCopy<? extends Item>> result = copiesById.values().stream()
+    .filter(c -> c.hasProperty("someValue"))
+    .findFirst();

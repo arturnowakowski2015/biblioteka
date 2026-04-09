@@ -1,11 +1,14 @@
 package pl.biblioteka.generic;
 
-import pl.biblioteka.model.User;
+ import pl.biblioteka.model.User;
 
 import java.time.LocalDateTime;
 
 public class GenericLoan<T extends pl.biblioteka.model.Item> {
+ 
     private final long id;
+    private boolean overdue; 
+    private LocalDateTime expectedReturnTime;
     private final User whoHas;
     private final GenericCopy<T> whatHas;
     private LocalDateTime from;
@@ -15,6 +18,8 @@ public class GenericLoan<T extends pl.biblioteka.model.Item> {
 	private LocalDateTime end;
 //
     public GenericLoan(long id, User whoHas, GenericCopy<T> whatHas, LocalDateTime from) {
+    	this.overdue=false; 
+    	this.expectedReturnTime=from.plusDays(30); 
         this.id = id;
         this.whoHas = whoHas;
         this.whatHas = whatHas;
@@ -27,4 +32,19 @@ public class GenericLoan<T extends pl.biblioteka.model.Item> {
     public LocalDateTime getFrom() { return from; }
     public LocalDateTime getEnd() { return end; }
     public void setEnd(LocalDateTime end) { this.end = end; }
-}
+    private void setExpectedReturnTime() {
+    	this.expectedReturnTime.plusDays(30);
+    }
+  
+    public LocalDateTime getExpectedReturnTime() {
+    	return this.expectedReturnTime;
+    }
+ 
+    public boolean getOverDue() {
+    	return this.overdue;
+    }
+    public void setOverDue() {
+    	this.overdue=!this.overdue;
+    }
+ 
+ }

@@ -1,0 +1,23 @@
+{
+    "name": "biblioteka-server-node",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "start": "node dist/server.js",
+        "dev": "tsx watch src/server.ts",
+        "build": "tsc",
+        "service": "npm run build && node dist/services/libraryService.js",
+        "service:ts": "node --import tsx src/services/libraryService.ts"
+    },
+    "dependencies": {
+        "cors": "^2.8.5",
+        "express": "^4.21.2"
+    },
+    "devDependencies": {
+        "@types/cors": "^2.8.17",
+        "@types/express": "^5.0.0",
+        "@types/node": "^22.0.0",
+        "tsx": "^4.19.0",
+        "typescript": "^5.8.0"
+    }
+}
